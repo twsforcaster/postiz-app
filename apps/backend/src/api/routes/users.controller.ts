@@ -141,7 +141,18 @@ export class UsersController {
     if (!name || name.length > 100 || !industries.includes(body.industry) || !goals.includes(body.goal)) {
       throw new HttpException('Invalid marketing profile', 400);
     }
-    const profile = { name, industry: body.industry, goal: body.goal };
+    const optionalText = (value: unknown, max: number) => {
+      if (value === undefined) return '';
+      if (typeof value !== 'string' || value.length > max) throw new HttpException('Invalid brand field', 400);
+      return value.trim();
+    };
+    const profile = {
+      name, industry: body.industry, goal: body.goal,
+      brandVoice: optionalText(body.brandVoice, 500),
+      audience: optionalText(body.audience, 1000),
+      products: optionalText(body.products, 2000),
+      guidelines: optionalText(body.guidelines, 2000),
+    };
     const result = await this._orgService.saveMarketingProfile(org.id, user.id, profile);
     if (result.count !== 1) throw new HttpForbiddenException();
     return { profile };

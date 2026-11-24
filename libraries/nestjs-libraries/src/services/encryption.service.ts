@@ -43,6 +43,9 @@ export class EncryptionService implements OnModuleInit {
   // A provider that cannot give its key has to stop the start, a service that
   // runs without the key cannot use any of the encrypted values
   async onModuleInit() {
+    if (process.env.MARKETING_OS_REQUIRE_ENCRYPTION === 'true' && !this.canEncrypt()) {
+      throw new Error('Marketing OS requires an active token encryption provider');
+    }
     if (this.hasProvider()) {
       await this.loadKey();
     }

@@ -59,6 +59,14 @@ export class OrganizationService {
     return this._organizationRepository.getAccountOverview(orgId);
   }
 
+  getMarketingProfile(orgId: string, userId: string) {
+    return this._organizationRepository.getMarketingProfile(orgId, userId);
+  }
+
+  saveMarketingProfile(orgId: string, userId: string, profile: { name: string; industry: string; goal: string }) {
+    return this._organizationRepository.saveMarketingProfile(orgId, userId, profile);
+  }
+
   getOrgByApiKey(api: string) {
     return this._organizationRepository.getOrgByApiKey(api);
   }

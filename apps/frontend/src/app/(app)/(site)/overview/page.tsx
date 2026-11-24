@@ -7,6 +7,7 @@ import { useUser } from '@gitroom/frontend/components/layout/user.context';
 
 type Channel = { id: string; name: string; identifier: string; disabled: boolean; refreshNeeded: boolean; inBetweenSteps: boolean };
 const shortcuts = [
+  { href: '/channels', title: 'Social channels', description: 'Review connection status and available platform adapters.' },
   { href: '/business-setup', title: 'Brand Intelligence', description: 'Manage business identity, audience and brand voice.' },
   { href: '/launches', title: 'Content calendar', description: 'Create, review and schedule your next post.' },
   { href: '/agents', title: 'AI workspace', description: 'Open the existing AI assistant.' },

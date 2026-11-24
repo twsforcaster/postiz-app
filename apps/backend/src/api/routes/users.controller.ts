@@ -1,3 +1,5 @@
+import { marketingAiCatalog, generateMarketingDraft } from '../../services/marketing-ai.gateway';
+import { ioRedis } from '@gitroom/nestjs-libraries/redis/redis.service';
 import {
   Body,
   Controller,
@@ -122,6 +124,25 @@ export class UsersController {
           ? organization?.apiKey
           : '',
     };
+  }
+
+  @Get('/marketing-ai/providers')
+  marketingAiProviders() {
+    return { providers: marketingAiCatalog() };
+  }
+
+  @Post('/marketing-ai/draft')
+  async marketingAiDraft(@GetUserFromRequest() user: User, @GetOrgFromRequest() org: Organization, @Req() req: Request, @Body() body: any) {
+    if (req.cookies?.impersonate || req.headers.impersonate) throw new HttpForbiddenException();
+    if (body?.workspaceId !== org.id) throw new HttpException('Workspace changed', 409);
+    // Experimental gateway remains restricted to explicitly allowlisted workspaces.
+    const allowed = (process.env.MARKETING_AI_ALLOWED_WORKSPACES || '').split(',').map(s=>s.trim()).filter(Boolean);
+    if (!allowed.includes(org.id)) throw new HttpForbiddenException();
+    const row = await this._orgService.getMarketingProfile(org.id, user.id);
+    if (!row) throw new HttpForbiddenException();
+    const limited = await ioRedis.set('marketing-ai:cooldown:'+org.id, '1', 'EX', 60, 'NX');
+    if (!limited) throw new HttpException('Workspace AI request limit reached', 429);
+    return generateMarketingDraft(body.provider, body.prompt, row.marketingProfile);
   }
 
   @Get('/marketing-profile')

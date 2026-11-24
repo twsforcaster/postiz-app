@@ -63,7 +63,7 @@ export class OrganizationService {
     return this._organizationRepository.getMarketingProfile(orgId, userId);
   }
 
-  saveMarketingProfile(orgId: string, userId: string, profile: { name: string; industry: string; goal: string }) {
+  saveMarketingProfile(orgId: string, userId: string, profile: { name: string; industry: string; goal: string; brandVoice?: string; audience?: string; products?: string; guidelines?: string }) {
     return this._organizationRepository.saveMarketingProfile(orgId, userId, profile);
   }
 

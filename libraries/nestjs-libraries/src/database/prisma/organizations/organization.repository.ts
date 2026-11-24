@@ -53,6 +53,20 @@ export class OrganizationRepository {
     });
   }
 
+  getMarketingProfile(orgId: string, userId: string) {
+    return this._organization.model.organization.findFirst({
+      where: { id: orgId, deletedAt: null, users: { some: { userId, disabled: false } } },
+      select: { marketingProfile: true },
+    });
+  }
+
+  saveMarketingProfile(orgId: string, userId: string, profile: { name: string; industry: string; goal: string }) {
+    return this._organization.model.organization.updateMany({
+      where: { id: orgId, deletedAt: null, users: { some: { userId, disabled: false, role: { in: [Role.ADMIN, Role.SUPERADMIN] } } } },
+      data: { marketingProfile: profile },
+    });
+  }
+
   getOrgByApiKey(api: string) {
     return this._organization.model.organization.findFirst({
       where: {

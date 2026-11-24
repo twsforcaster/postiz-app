@@ -124,6 +124,29 @@ export class UsersController {
     };
   }
 
+  @Get('/marketing-profile')
+  async getMarketingProfile(@GetUserFromRequest() user: User, @GetOrgFromRequest() org: Organization) {
+    const row = await this._orgService.getMarketingProfile(org.id, user.id);
+    if (!row) throw new HttpForbiddenException();
+    return { profile: row.marketingProfile };
+  }
+
+  @Post('/marketing-profile')
+  async saveMarketingProfile(@GetUserFromRequest() user: User, @GetOrgFromRequest() org: Organization, @Req() req: Request, @Body() body: any) {
+    if (req.cookies?.impersonate || req.headers.impersonate) throw new HttpForbiddenException();
+    if (body?.workspaceId !== org.id) throw new HttpException('Workspace changed', 409);
+    const name = typeof body.name === 'string' ? body.name.trim() : '';
+    const industries = ['E-commerce','Marketing agency','Financial education','Real estate','SaaS','Local business','Creator','Other'];
+    const goals = ['Brand awareness','Lead generation','Audience growth','Sales','Customer engagement'];
+    if (!name || name.length > 100 || !industries.includes(body.industry) || !goals.includes(body.goal)) {
+      throw new HttpException('Invalid marketing profile', 400);
+    }
+    const profile = { name, industry: body.industry, goal: body.goal };
+    const result = await this._orgService.saveMarketingProfile(org.id, user.id, profile);
+    if (result.count !== 1) throw new HttpForbiddenException();
+    return { profile };
+  }
+
   @Get('/personal')
   async getPersonalInformation(@GetUserFromRequest() user: User) {
     return this._userService.getPersonal(user.id);

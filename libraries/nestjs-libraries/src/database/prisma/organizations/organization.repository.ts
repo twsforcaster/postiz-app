@@ -60,7 +60,7 @@ export class OrganizationRepository {
     });
   }
 
-  saveMarketingProfile(orgId: string, userId: string, profile: { name: string; industry: string; goal: string }) {
+  saveMarketingProfile(orgId: string, userId: string, profile: { name: string; industry: string; goal: string; brandVoice?: string; audience?: string; products?: string; guidelines?: string }) {
     return this._organization.model.organization.updateMany({
       where: { id: orgId, deletedAt: null, users: { some: { userId, disabled: false, role: { in: [Role.ADMIN, Role.SUPERADMIN] } } } },
       data: { marketingProfile: profile },

@@ -101,7 +101,7 @@ export class AuthMiddleware implements NestMiddleware {
         organization.find((org) => org.subscription) ||
         organization[0];
 
-      if (!organization) {
+      if (!setOrg) {
         throw new HttpForbiddenException();
       }
 
